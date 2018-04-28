@@ -1,0 +1,23 @@
+{{define "topic/index"}}
+
+{{template "header"}}
+    <div>
+        <ul class="nav nav-pills float-left mb30">
+            {{range .categories}}
+            <li class="nav-item">
+                <a class="nav-link" href="">{{.Name}}</a>
+            </li>
+            {{end}}
+        </ul>
+        <a href="/topic/create" class="btn btn-success float-right">Create</a>
+        <div class="clearfix"></div>
+    </div>
+    <ul class="list-group">
+        {{range .topics}}
+            <li class="list-group-item"><a href="/topic?id={{.Id}}">{{.Title}}</a></li>
+        {{end}}
+    </ul>
+    {{.page | html}}
+
+{{template "footer"}}
+{{end}}
