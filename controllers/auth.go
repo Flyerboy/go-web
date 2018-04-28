@@ -33,3 +33,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Render(w, "auth/login", nil)
 	}
 }
+
+func Register(w http.ResponseWriter, r *http.Request)  {
+	if strings.Compare(r.Method, "POST") == 0 {
+
+	} else {
+		Render(w, "auth/register", nil)
+	}
+}

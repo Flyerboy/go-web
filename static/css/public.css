@@ -8,6 +8,7 @@
 body{
     background-color: #eeeeee;
 }
+
 .login{
     border: 1px solid #dddddd;
     padding: 35px 25px 10px;
@@ -16,5 +17,8 @@ body{
     border-radius: 5px;
     width: 400px;
     margin: 100px auto;
+    background-color: #ffffff;
+}
+.bg-white{
     background-color: #ffffff;
 }

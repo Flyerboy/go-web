@@ -1,8 +1,8 @@
 {{define "topic/index"}}
 
 {{template "header"}}
-    <div>
-        <ul class="nav nav-pills float-left mb30">
+    <div class="bg-white topic">
+        <ul class="nav nav-pills float-left">
             {{range .categories}}
             <li class="nav-item">
                 <a class="nav-link" href="">{{.Name}}</a>
@@ -10,7 +10,7 @@
             {{end}}
         </ul>
         <a href="/topic/create" class="btn btn-success float-right">Create</a>
-        <div class="clearfix"></div>
+        <div class="clearfix mb30"></div>
     </div>
     <ul class="list-group">
         {{range .topics}}

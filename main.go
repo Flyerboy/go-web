@@ -14,6 +14,7 @@ func main() {
 	http.HandleFunc("/topic", controllers.TopicShow)
 	http.HandleFunc("/topic/create", controllers.TopicCreate)
 	http.HandleFunc("/login", controllers.Login)
+	http.HandleFunc("/register", controllers.Register)
 
 	http.ListenAndServe(":8005", nil)
 
