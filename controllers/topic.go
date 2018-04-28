@@ -21,6 +21,9 @@ func TopicShow(w http.ResponseWriter, r *http.Request) {
 func TopicIndex(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	p := r.Form.Get("p")
+	if p == "" {
+		p = "1"
+	}
 	page, _ := strconv.Atoi(p)
 
 	data := make(map[string]interface{})

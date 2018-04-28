@@ -1,13 +1,48 @@
 package model
 
-import "database/sql"
+import (
+	"database/sql"
+	"net/http"
+	"strconv"
+	"fmt"
+)
 
 type User struct {
 	Id int
 	Name string
 	Email string
-	Age int
+	Password string
 }
+
+func GetUserByEmail(email string) *User {
+	var user User
+	err := DB.QueryRow("select id,name,email,password from users where email=?", email).Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+
+	if err != nil {
+		return &user
+	}
+	return &user
+}
+
+func CheckLogin(r *http.Request) *User {
+	user_id, err := r.Cookie("user_id")
+	fmt.Println(user_id)
+	if err != nil {
+		return nil
+	}
+	id, _ := strconv.Atoi(user_id.Value)
+	user, _ := GetUser(id)
+	return user
+}
+
+func SetLogin(w http.ResponseWriter, user *User)  {
+	cookie := http.Cookie{
+		Name: "user_id",
+		Value: strconv.Itoa(user.Id),
+	}
+	http.SetCookie(w, &cookie)
+}
+
 
 func GetUser(id int) (*User, error) {
 	/*var user User
