@@ -8,13 +8,12 @@ import (
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	login := model.CheckLogin(r)
-	if login.Id > 0 {
+	if login != nil {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	}
 	if strings.Compare(r.Method, "POST") == 0 {
-		r.ParseForm()
-		email := r.Form.Get("email")
-		password := r.Form.Get("password")
+		email := r.FormValue("email")
+		password := r.FormValue("password")
 		user := model.GetUserByEmail(email)
 		/*if user.Id > 0 && strings.Compare(user.Password, password) == 0 {
 			w.Write([]byte("login success"))

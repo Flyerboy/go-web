@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 	"fmt"
+	"strconv"
 )
 
 func unescaped(x string) interface{} {
@@ -40,17 +41,22 @@ func Render(w http.ResponseWriter, name string, data map[string]interface{}) {
 
 }
 
-func Page(total, size, page int) (int, string) {
+func Page(total, size int, r *http.Request) (int, string) {
+	p := r.FormValue("p")
+	if p == "" {
+		p = "1"
+	}
+	page, _ := strconv.Atoi(p)
 
 	start := (page - 1) * size
 
-	total_page := total / size
+	totalPage := total / size
 
 	//show := 5
 
 	html := "<ul class='pagination mt30'>"
 
-	for i := 1; i <= total_page; i++ {
+	for i := 1; i <= totalPage; i++ {
 		if page == i {
 			html += fmt.Sprintf("<li class='page-item active'><a href='?p=%d' class='page-link'>%d</a></li>", i, i)
 		} else {

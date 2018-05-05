@@ -7,7 +7,7 @@ type Category struct {
 
 func GetHotCategory(num int) []*Category {
 	categories := make([]*Category, num)
-	statement, err := DB.Query("select id,name from category limit ?", num)
+	statement, err := getDB().Query("select id,name from category limit ?", num)
 
 	if err != nil {
 		panic(err.Error())

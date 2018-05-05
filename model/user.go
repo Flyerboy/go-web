@@ -16,7 +16,7 @@ type User struct {
 
 func GetUserByEmail(email string) *User {
 	var user User
-	err := DB.QueryRow("select id,name,email,password from users where email=?", email).Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+	err := getDB().QueryRow("select id,name,email,password from users where email=?", email).Scan(&user.Id, &user.Name, &user.Email, &user.Password)
 
 	if err != nil {
 		return &user
@@ -25,12 +25,12 @@ func GetUserByEmail(email string) *User {
 }
 
 func CheckLogin(r *http.Request) *User {
-	user_id, err := r.Cookie("user_id")
-	fmt.Println(user_id)
+	userId, err := r.Cookie("user_id")
+	fmt.Println(userId)
 	if err != nil {
 		return nil
 	}
-	id, _ := strconv.Atoi(user_id.Value)
+	id, _ := strconv.Atoi(userId.Value)
 	user, _ := GetUser(id)
 	return user
 }
@@ -39,6 +39,8 @@ func SetLogin(w http.ResponseWriter, user *User)  {
 	cookie := http.Cookie{
 		Name: "user_id",
 		Value: strconv.Itoa(user.Id),
+		HttpOnly: true,
+		Secure: true,
 	}
 	http.SetCookie(w, &cookie)
 }
@@ -46,7 +48,7 @@ func SetLogin(w http.ResponseWriter, user *User)  {
 
 func GetUser(id int) (*User, error) {
 	/*var user User
-	statment, err := DB.Prepare("select id,name,email from users where id=?")
+	statment, err := getDB().Prepare("select id,name,email from users where id=?")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -58,7 +60,7 @@ func GetUser(id int) (*User, error) {
 	return &user*/
 
 	var user User
-	err := DB.QueryRow("select id,name,email from users where id=?", id).Scan(&user.Id, &user.Name, &user.Email)
+	err := getDB().QueryRow("select id,name,email from users where id=?", id).Scan(&user.Id, &user.Name, &user.Email)
 
 	if err != nil {
 		panic(err.Error())
@@ -102,7 +104,7 @@ func SelectUser(id int) []*User {
 }
 
 func CreateUser() bool {
-	statement, err := DB.Prepare("insert into users(name,email) values(?, ?)")
+	statement, err := getDB().Prepare("insert into users(name,email) values(?, ?)")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -126,7 +128,7 @@ func CreateUser() bool {
 }
 
 func UpdateUser(id int, user *User) bool {
-	statement, err := DB.Prepare("update users set name=?, email=? where id=?")
+	statement, err := getDB().Prepare("update users set name=?, email=? where id=?")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -143,7 +145,7 @@ func UpdateUser(id int, user *User) bool {
 }
 
 func DeleteUser(id int) bool {
-	statement, err := DB.Prepare("delete from users where id=?")
+	statement, err := getDB().Prepare("delete from users where id=?")
 	if err != nil {
 		panic(err.Error())
 	}

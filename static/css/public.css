@@ -22,3 +22,10 @@ body{
 .bg-white{
     background-color: #ffffff;
 }
+
+.topic-content{
+    padding: 15px;
+}
+.topic-title{
+    margin-bottom: 15px;
+}

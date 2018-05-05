@@ -10,7 +10,7 @@ type Topic struct {
 
 func GetTopicById(id int) *Topic {
 	var topic Topic
-	err := DB.QueryRow("select id,title,content from topic where id=?", id).Scan(&topic.Id, &topic.Title, &topic.Content)
+	err := getDB().QueryRow("select id,title,content from topic where id=?", id).Scan(&topic.Id, &topic.Title, &topic.Content)
 	if err != nil {
 		return nil
 	}
@@ -20,7 +20,7 @@ func GetTopicById(id int) *Topic {
 func GetTopics(start, size int) []*Topic {
 	var topics []*Topic
 
-	statement, err := DB.Query("select id, title from topic order by id desc limit ?, ?", start, size)
+	statement, err := getDB().Query("select id, title from topic order by id desc limit ?, ?", start, size)
 	if err != nil {
 		fmt.Println(err)
 		return nil

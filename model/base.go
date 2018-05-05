@@ -5,12 +5,10 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var DB *sql.DB
-
-func init()  {
+func getDB() *sql.DB {
 	db, err := sql.Open("mysql", "root:root@/video")
 	if err != nil {
 		panic(err.Error())
 	}
-	DB = db
+	return db
 }

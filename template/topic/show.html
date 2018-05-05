@@ -8,8 +8,10 @@
         <li class="breadcrumb-item active" aria-current="page">{{.topic.Title}}</li>
     </ol>
 </nav>
-<h3>{{.topic.Title}}</h3>
-<div>{{.topic.Content | html}}</div>
+<div class="bg-white topic-content">
+    <h3 class="topic-title">{{.topic.Title}}</h3>
+    <div>{{.topic.Content | html}}</div>
+</div>
 
 {{template "footer"}}
 {{end}}
