@@ -6,7 +6,15 @@ import (
 	"strings"
 	"fmt"
 	"strconv"
+	"encoding/json"
 )
+
+type JsonResponse struct {
+	Status int `json:"status"`
+	Msg string `json:"msg"`
+	Data interface{} `json:"data"`
+	Total int `json:"total"`
+}
 
 func unescaped(x string) interface{} {
 	return template.HTML(x)
@@ -67,3 +75,14 @@ func Page(total, size int, r *http.Request) (int, string) {
 	html += "</ul>"
 	return start, html
 }
+
+func jsonReponse(status int, msg string, data interface{}) []byte {
+	res := JsonResponse{
+		Status: status,
+		Msg: msg,
+		Data: data,
+	}
+	str, _ := json.Marshal(res)
+	return str
+}
+

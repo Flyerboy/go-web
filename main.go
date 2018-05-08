@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 	"project/controllers"
+	"strings"
+	"fmt"
 )
 
 func main() {
@@ -16,6 +18,16 @@ func main() {
 	http.HandleFunc("/login", controllers.Login)
 	http.HandleFunc("/register", controllers.Register)
 
+	http.HandleFunc("/comments", controllers.CommentIndex)
+	http.HandleFunc("/comment/create", controllers.CommentCreate)
+
 	http.ListenAndServe(":8005", nil)
 
+}
+
+func route(url string) http.Handler {
+	arr := strings.Split(url, "@")
+
+	fmt.Println(arr)
+	return nil
 }

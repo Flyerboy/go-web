@@ -8,10 +8,60 @@
         <li class="breadcrumb-item active" aria-current="page">{{.topic.Title}}</li>
     </ol>
 </nav>
-<div class="bg-white topic-content">
+<div class="bg-white topic-content mb30">
     <h3 class="topic-title">{{.topic.Title}}</h3>
     <div>{{.topic.Content | html}}</div>
 </div>
+<div class="comments mb30" id="comments">
+    <ul class="list-group mb30">
+        <li class="list-group-item"><h4>评论 （{total}）</h4></li>
+        <li class="list-group-item" v-for="row in lists">{row.content}</li>
+    </ul>
+    <h4>发表评论</h4>
+    <textarea class="form-control mb20" v-model="content"></textarea>
+    <button class="btn btn-success" @click="createComment()">发表</button>
+</div>
+<script src="https://cdn.bootcss.com/vue/2.5.16/vue.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
+<script>
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+    const vm = new Vue({
+        el: '#comments',
+        delimiters: ['{', '}'],
+        data: {
+            total: 0,
+            lists: [],
+            id: '{{.topic.Id}}',
+            content: ''
+        },
+        created: function () {
+            this.getComments()
+        },
+        methods: {
+            getComments: function () {
+                var $this = this
+                axios.get("/comments?id=" + this.id).then(function (res) {
+                    if (res.status == 200) {
+                        $this.lists = res.data.data
+                        $this.total = res.data.total
+                    }
+                })
+            },
+            createComment: function () {
+                axios.post('comment/create', {
+                    map_id: this.id,
+                    content: this.content
+                }).then(function (res) {
+                    if (res.status == 200) {
+                        alert('success')
+                    } else {
+                        alert('error')
+                    }
+                })
+            }
+        }
+    })
+</script>
 
 {{template "footer"}}
 {{end}}
