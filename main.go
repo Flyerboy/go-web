@@ -13,6 +13,7 @@ func main() {
 	http.Handle("/js/", http.FileServer(http.Dir("static")))
 
 	http.HandleFunc("/", controllers.TopicIndex)
+	http.HandleFunc("/topic/index", controllers.TopicIndex)
 	http.HandleFunc("/topic", controllers.TopicShow)
 	http.HandleFunc("/topic/create", controllers.TopicCreate)
 	http.HandleFunc("/login", controllers.Login)

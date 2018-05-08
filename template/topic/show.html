@@ -1,16 +1,17 @@
 {{define "topic/show"}}
 
 {{template "header"}}
+<link rel="stylesheet" href="/css/prism.css">
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
-        <li class="breadcrumb-item"><a href="/topic">Topic</a></li>
+        <li class="breadcrumb-item"><a href="/topic/index">Topic</a></li>
         <li class="breadcrumb-item active" aria-current="page">{{.topic.Title}}</li>
     </ol>
 </nav>
 <div class="bg-white topic-content mb30">
     <h3 class="topic-title">{{.topic.Title}}</h3>
-    <div>{{.topic.Content | html}}</div>
+    <div id="comment-content"></div>
 </div>
 <div class="comments mb30" id="comments">
     <ul class="list-group mb30">
@@ -21,9 +22,12 @@
     <textarea class="form-control mb20" v-model="content"></textarea>
     <button class="btn btn-success" @click="createComment()">发表</button>
 </div>
+<script src="/js/prism.js"></script>
+<script src="/js/marked.min.js"></script>
 <script src="https://cdn.bootcss.com/vue/2.5.16/vue.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
 <script>
+    document.getElementById('comment-content').innerHTML = marked('{{.topic.Content | html}}')
     axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
     const vm = new Vue({
         el: '#comments',

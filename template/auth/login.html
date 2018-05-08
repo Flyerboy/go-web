@@ -2,22 +2,22 @@
 
 {{template "header"}}
 
+
 <form method="post" action="" class="login">
+    <h3 class="text-center mb30">Login</h3>
     <div class="form-group row">
-        <label for="staticEmail" class="col-sm-3 col-form-label">Email</label>
-        <div class="col-sm-9">
-            <input type="text" class="form-control" name="email">
+        <div class="col-sm-12">
+            <input type="text" class="form-control" name="email" placeholder="Email">
+        </div>
+    </div>
+    <div class="form-group row mb30">
+        <div class="col-sm-12">
+            <input type="password" class="form-control" name="password" placeholder="Password">
         </div>
     </div>
     <div class="form-group row">
-        <label for="inputPassword" class="col-sm-3 col-form-label">Password</label>
-        <div class="col-sm-9">
-            <input type="password" class="form-control" name="password">
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-sm-9 offset-sm-3">
-            <button type="submit" class="btn btn-success btn-block">Login</button>
+        <div class="col-sm-12">
+            <button type="submit" class="btn btn-info btn-block">Login</button>
         </div>
     </div>
 </form>
