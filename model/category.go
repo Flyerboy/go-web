@@ -5,7 +5,7 @@ type Category struct {
 	Name string
 }
 
-func GetHotCategory(num int) []*Category {
+func (this *Category) GetHot(num int) []*Category {
 	categories := make([]*Category, num)
 	statement, err := getDB().Query("select id,name from category limit ?", num)
 

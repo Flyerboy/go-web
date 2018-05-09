@@ -29,7 +29,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
-		Render(w, "auth/login", nil)
+		controller := Controller{
+			writer: w,
+			template: "auth/login",
+		}
+		controller.Render()
 	}
 }
 
@@ -37,6 +41,10 @@ func Register(w http.ResponseWriter, r *http.Request)  {
 	if strings.Compare(r.Method, "POST") == 0 {
 
 	} else {
-		Render(w, "auth/register", nil)
+		controller := Controller{
+			writer: w,
+			template: "auth/register",
+		}
+		controller.Render()
 	}
 }

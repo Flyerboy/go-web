@@ -9,20 +9,23 @@ import (
 	"encoding/json"
 )
 
-type JsonResponse struct {
-	Status int `json:"status"`
-	Msg string `json:"msg"`
-	Data interface{} `json:"data"`
-	Total int `json:"total"`
+type Controller struct {
+	writer http.ResponseWriter
+	template string
+	data map[string]interface{}
 }
 
 func unescaped(x string) interface{} {
 	return template.HTML(x)
 }
 
-func Render(w http.ResponseWriter, name string, data map[string]interface{}) {
+func (this *Controller) Assign(name string, value interface{}) {
+	this.data[name] = value
+}
 
-	tplname := strings.TrimRight(name, ".html") + ".html"
+func (this *Controller) Render() {
+
+	tplname := strings.TrimRight(this.template, ".html") + ".html"
 
 	files := []string{
 		"header.html",
@@ -39,12 +42,11 @@ func Render(w http.ResponseWriter, name string, data map[string]interface{}) {
 
 	tmpl, err := t.ParseFiles(files[0], files[1], files[2])
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(this.writer, err.Error(), http.StatusInternalServerError)
 	}
-
-	err = tmpl.ExecuteTemplate(w, name, data)
+	err = tmpl.ExecuteTemplate(this.writer, this.template, this.data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(this.writer, err.Error(), http.StatusInternalServerError)
 	}
 
 }
@@ -76,13 +78,22 @@ func Page(total, size int, r *http.Request) (int, string) {
 	return start, html
 }
 
-func jsonReponse(status int, msg string, data interface{}) []byte {
-	res := JsonResponse{
-		Status: status,
-		Msg: msg,
-		Data: data,
+type JsonResponse struct {
+	writer http.ResponseWriter
+	Status int `json:"status"`
+	Msg string `json:"msg"`
+	Data interface{} `json:"data"`
+	Total int `json:"total"`
+}
+
+func (this *JsonResponse)Write() {
+	str, err := json.Marshal(this)
+	if err == nil {
+		this.writer.Header().Set("Content-Type", "application/json")
+		this.writer.Write(str)
+	} else {
+		this.writer.WriteHeader(http.StatusNotFound)
 	}
-	str, _ := json.Marshal(res)
-	return str
+
 }
 

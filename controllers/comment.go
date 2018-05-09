@@ -4,9 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"project/model"
-	"encoding/json"
 )
-
 
 
 func CommentIndex(w http.ResponseWriter, req *http.Request) {
@@ -14,20 +12,19 @@ func CommentIndex(w http.ResponseWriter, req *http.Request) {
 	cid, _ := strconv.Atoi(id)
 	last := req.FormValue("last_id")
 	lastId, _ := strconv.Atoi(last)
-	comments, total := model.GetComments(cid, lastId)
+
+	commentModel := model.Comment{}
+
+	comments, total := commentModel.GetLists(cid, lastId)
 
 	res := JsonResponse{
-		Status: 200,
-		Msg: "ok",
+		writer: w,
+		Status: http.StatusOK,
 		Data: comments,
 		Total: total,
+		Msg: "ok",
 	}
-	str, err := json.Marshal(res)
-	if err == nil {
-		w.Write(str)
-	} else {
-		w.WriteHeader(http.StatusNotFound)
-	}
+	res.Write()
 }
 
 func CommentCreate(w http.ResponseWriter, req *http.Request) {
@@ -35,9 +32,23 @@ func CommentCreate(w http.ResponseWriter, req *http.Request) {
 	content := req.FormValue("content")
 	id, _ := strconv.Atoi(mapId)
 
-	err := model.CreateComment(id, content)
+	if id == 0 || content == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	commentModel := model.Comment{
+		MapId: id,
+		Content: content,
+	}
+	err := commentModel.Create()
 	if err {
-		w.WriteHeader(http.StatusOK)
+		res := JsonResponse{
+			writer: w,
+			Status: http.StatusOK,
+			Msg: "ok",
+		}
+		res.Write()
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 	}

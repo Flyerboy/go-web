@@ -1,14 +1,18 @@
 package model
 
-import "sync"
+import (
+	"sync"
+	"time"
+)
 
 type Comment struct {
 	Id int `json:"id"`
+	MapId int
 	Content string `json:"content"`
 	CreatedAt string `json:"created_at"`
 }
 
-func GetComments(id, lastId int) ([]*Comment, int) {
+func (this *Comment) GetLists(id, lastId int) ([]*Comment, int) {
 	var comments []*Comment
 
 	ch := make(chan *Comment, 5)
@@ -46,16 +50,18 @@ func GetComments(id, lastId int) ([]*Comment, int) {
 	}(&total, &sy)
 
 	sy.Wait()
+	getDB().Close()
 	return comments, total
 }
 
-func CreateComment(mapId int, content string) bool {
-	statement, err := getDB().Prepare("insert into comments(map_id,content) values(?, ?)")
+func (this *Comment) Create() bool {
+	statement, err := getDB().Prepare("insert into comments(map_id,content,created_at) values(?, ?, ?)")
+	defer getDB().Close()
 	if err != nil {
 		panic(err.Error())
 	}
 	defer statement.Close()
-	res, err := statement.Exec(mapId, content)
+	res, err := statement.Exec(this.MapId, this.Content, time.Now().Format("2012-01-01 00:00:00"))
 	if err != nil {
 		return false
 	}
