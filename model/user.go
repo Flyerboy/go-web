@@ -1,10 +1,11 @@
 package model
 
 import (
-	"database/sql"
 	"net/http"
 	"strconv"
 	"fmt"
+	"errors"
+	"strings"
 )
 
 type User struct {
@@ -14,16 +15,13 @@ type User struct {
 	Password string
 }
 
-func GetUserByEmail(email string) *User {
-	var user User
-	err := getDB().QueryRow("select id,name,email,password from users where email=?", email).Scan(&user.Id, &user.Name, &user.Email, &user.Password)
-
-	if err != nil {
-		return &user
-	}
-	return &user
+// 密码加密
+func encryptPassword(password string) string {
+	return password
 }
 
+
+// 检查是否登录
 func CheckLogin(r *http.Request) *User {
 	userId, err := r.Cookie("user_id")
 	fmt.Println(userId)
@@ -35,6 +33,7 @@ func CheckLogin(r *http.Request) *User {
 	return user
 }
 
+// 设置登录cookie
 func SetLogin(w http.ResponseWriter, user *User)  {
 	cookie := http.Cookie{
 		Name: "user_id",
@@ -46,70 +45,54 @@ func SetLogin(w http.ResponseWriter, user *User)  {
 }
 
 
+// 根据ID获取用户信息
 func GetUser(id int) (*User, error) {
-	/*var user User
-	statment, err := getDB().Prepare("select id,name,email from users where id=?")
-	if err != nil {
-		panic(err.Error())
-	}
-	defer statment.Close()
-	row, err := statment.Query(id)
-	if row.Next() {
-		row.Scan(&user.Id, &user.Name, &user.Email)
-	}
-	return &user*/
-
 	var user User
 	err := getDB().QueryRow("select id,name,email from users where id=?", id).Scan(&user.Id, &user.Name, &user.Email)
 
 	if err != nil {
-		panic(err.Error())
+		return &user, err
 	}
 	return &user, err
 
 }
 
-func SelectUser(id int) []*User {
-	db, err := sql.Open("mysql", "root:root@/video")
-	if err != nil {
-		panic(err.Error())
+// 检查邮箱是否存在
+func (this *User) CheckEmail(email string) bool {
+	count := 0
+	err := getDB().QueryRow("select count(id) count from users where email=? limit 1", email).Scan(&count)
+	if err == nil && count > 0 {
+		return true
 	}
-	defer db.Close()
-	rows, err := db.Query("select id,name,email from users limit 10")
-	if err != nil {
-		panic(err.Error())
-	}
-	/*
-	users, err := rows.Columns()
-	fmt.Println(users)
-	*/
-	var users []*User
-	//users := make([]*User, 10)
-	i := 0
-
-	defer rows.Close()
-	for rows.Next() {
-		var tmp User
-		err := rows.Scan(&tmp.Id, &tmp.Name, &tmp.Email)
-		if err != nil {
-			panic(err.Error())
-		}
-		//fmt.Println(user)
-		//users[i] = &tmp
-		users = append(users, &tmp)
-		i++
-	}
-	//fmt.Println(users)
-	return users
+	return false
 }
 
-func CreateUser() bool {
-	statement, err := getDB().Prepare("insert into users(name,email) values(?, ?)")
+// 用户登录
+func (this *User) Login() (*User, error)  {
+	var user User
+	err := getDB().QueryRow("select id,name,email,password from users where email=?", this.Email).Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+
+	if err != nil || user.Id == 0 {
+		return &user, errors.New("用户不存在")
+	}
+
+	password := encryptPassword(this.Password)
+	if strings.Compare(user.Password, password) != 0 {
+		return &user, errors.New("用户名或密码错误")
+	}
+
+	return &user, nil
+}
+
+// 创建用户
+func (this *User) Create() bool {
+	statement, err := getDB().Prepare("insert into users(name,email,password) values(?, ?, ?)")
+	defer statement.Close()
 	if err != nil {
 		panic(err.Error())
 	}
-	defer statement.Close()
-	res, err := statement.Exec("wang", "wang@aa.com")
+	password := encryptPassword(this.Password)
+	res, err := statement.Exec(this.Name, this.Email, password)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -127,12 +110,13 @@ func CreateUser() bool {
 	return false
 }
 
+
 func UpdateUser(id int, user *User) bool {
 	statement, err := getDB().Prepare("update users set name=?, email=? where id=?")
+	defer statement.Close()
 	if err != nil {
 		panic(err.Error())
 	}
-	defer statement.Close()
 	res, err := statement.Exec(user.Name, user.Email, id)
 	if err != nil {
 		panic(err.Error())
@@ -144,12 +128,13 @@ func UpdateUser(id int, user *User) bool {
 	return false
 }
 
-func DeleteUser(id int) bool {
+// 删除用户
+func (this *User) Delete(id int) bool {
 	statement, err := getDB().Prepare("delete from users where id=?")
+	defer statement.Close()
 	if err != nil {
 		panic(err.Error())
 	}
-	defer statement.Close()
 	res, err := statement.Exec(id)
 	if err != nil {
 		panic(err.Error())
