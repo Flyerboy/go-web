@@ -9,6 +9,8 @@
     <title>Go Web</title>
     <link href="https://cdn.bootcss.com/bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/public.css">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb30">
@@ -27,8 +29,22 @@
             </li>
         </ul>
         <form>
-            <a href="/login" class="btn btn-info" role="button">Login</a>
-            <a href="/register" class="btn btn-success" role="button">Register</a>
+            {{if .user}}
+                <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{.user.Name}}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/profile">Profile</a>
+                        <a class="dropdown-item" href="/logout">Logout</a>
+                    </div>
+                </li>
+                </ul>
+            {{else}}
+                <a href="/login" class="btn btn-info" role="button">Login</a>
+                <a href="/register" class="btn btn-success" role="button">Register</a>
+            {{end}}
         </form>
     </div>
 </nav>

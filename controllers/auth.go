@@ -29,6 +29,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			model.SetLogin(w, user)
 			http.Redirect(w, r, "/", http.StatusMovedPermanently)
+			return
 		}
 		controller.Assign("Error", err.Error())
 	}
@@ -77,4 +78,15 @@ func Register(w http.ResponseWriter, req *http.Request)  {
 	}
 	controller.Render()
 
+}
+
+func Logout(w http.ResponseWriter, req *http.Request)  {
+	cookie := http.Cookie{
+		Name: "user_id",
+		Value: "",
+		MaxAge: -1,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+	http.Redirect(w, req, "/", http.StatusMovedPermanently)
 }

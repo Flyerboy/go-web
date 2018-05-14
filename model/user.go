@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"errors"
 	"strings"
+	"crypto/sha256"
+	"io"
 )
 
 type User struct {
@@ -15,16 +17,19 @@ type User struct {
 	Password string
 }
 
+const PASSWORD_SALT = "#25%C7"
 // 密码加密
 func encryptPassword(password string) string {
-	return password
+	pwd := password + PASSWORD_SALT
+	h := sha256.New()
+	io.WriteString(h, pwd)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 
 // 检查是否登录
 func CheckLogin(r *http.Request) *User {
 	userId, err := r.Cookie("user_id")
-	fmt.Println(userId)
 	if err != nil {
 		return nil
 	}
@@ -39,7 +44,6 @@ func SetLogin(w http.ResponseWriter, user *User)  {
 		Name: "user_id",
 		Value: strconv.Itoa(user.Id),
 		HttpOnly: true,
-		Secure: true,
 	}
 	http.SetCookie(w, &cookie)
 }

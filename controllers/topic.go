@@ -47,6 +47,8 @@ func TopicIndex(w http.ResponseWriter, req *http.Request) {
 	controller.Assign("topics", topics)
 	controller.Assign("page", pageHtml)
 
+	controller.Assign("user", model.CheckLogin(req))
+
 	categoryModel := model.Category{}
 	categories := categoryModel.GetHot(3)
 	controller.Assign("categories", categories)
