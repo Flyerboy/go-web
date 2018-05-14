@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"net/http"
 	"strings"
-	"fmt"
 	"strconv"
 	"encoding/json"
 )
@@ -13,6 +12,15 @@ type Controller struct {
 	writer http.ResponseWriter
 	template string
 	data map[string]interface{}
+}
+
+func getPage(req *http.Request) int {
+	p := req.FormValue("p")
+	if p == "" {
+		p = "1"
+	}
+	page, _ := strconv.Atoi(p)
+	return page
 }
 
 func unescaped(x string) interface{} {
@@ -51,32 +59,6 @@ func (this *Controller) Render() {
 
 }
 
-func Page(total, size int, r *http.Request) (int, string) {
-	p := r.FormValue("p")
-	if p == "" {
-		p = "1"
-	}
-	page, _ := strconv.Atoi(p)
-
-	start := (page - 1) * size
-
-	totalPage := total / size
-
-	//show := 5
-
-	html := "<ul class='pagination mt30'>"
-
-	for i := 1; i <= totalPage; i++ {
-		if page == i {
-			html += fmt.Sprintf("<li class='page-item active'><a href='?p=%d' class='page-link'>%d</a></li>", i, i)
-		} else {
-			html += fmt.Sprintf("<li class='page-item'><a href='?p=%d' class='page-link'>%d</a></li>", i, i)
-		}
-	}
-
-	html += "</ul>"
-	return start, html
-}
 
 type JsonResponse struct {
 	writer http.ResponseWriter
@@ -86,7 +68,7 @@ type JsonResponse struct {
 	Total int `json:"total"`
 }
 
-func (this *JsonResponse)Write() {
+func (this *JsonResponse) Write() {
 	str, err := json.Marshal(this)
 	if err == nil {
 		this.writer.Header().Set("Content-Type", "application/json")

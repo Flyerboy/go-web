@@ -13,12 +13,12 @@ type Comment struct {
 }
 
 func (this *Comment) GetLists(id, lastId int) ([]*Comment, int) {
-	var comments []*Comment
+
 
 	ch := make(chan *Comment, 5)
 	sy := sync.WaitGroup{}
 	sy.Add(2)
-	go func(commentChan chan *Comment, sy *sync.WaitGroup) {
+	go func() {
 		statement, err := getDB().Query("select id,content,created_at from comments where map_id=? order by id desc limit 20", id)
 		defer statement.Close()
 		if err == nil {
@@ -29,25 +29,25 @@ func (this *Comment) GetLists(id, lastId int) ([]*Comment, int) {
 				if err != nil {
 					break
 				}
-				commentChan <- &c
+				ch <- &c
 			}
+			close(ch)
 		}
 		sy.Done()
-	}(ch, &sy)
+	}()
 
-	for i := 0; i < 20; i++ {
-		c := <- ch
-		comments = append(comments, c)
+	var comments []*Comment
+	for i := range ch {
+		comments = append(comments, i)
 	}
-	close(ch)
 
 	total := 0
-	go func(total *int, sy *sync.WaitGroup) {
-		err := getDB().QueryRow("select count(id) num from comments where map_id=? limit 1", id).Scan(total)
+	go func() {
+		err := getDB().QueryRow("select count(id) num from comments where map_id=? limit 1", id).Scan(&total)
 		if err != nil {
 		}
 		sy.Done()
-	}(&total, &sy)
+	}()
 
 	sy.Wait()
 	getDB().Close()

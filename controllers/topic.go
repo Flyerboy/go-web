@@ -5,6 +5,7 @@ import (
 	"project/model"
 	"strconv"
 	"strings"
+	"project/utils"
 )
 
 
@@ -33,10 +34,19 @@ func TopicIndex(w http.ResponseWriter, req *http.Request) {
 	size := 10
 	topicModel := model.Topic{}
 	count := topicModel.Count()
-	start, pageHtml := Page(count, size, req)
+	p := getPage(req)
+	start := (p - 1) * size
+
+	page := utils.Page{
+		Total: count,
+		CurrentPage: p,
+		PageSize: size,
+	}
+	pageHtml := page.ToHTML()
 	topics, _ := topicModel.GetLists(start, size)
 	controller.Assign("topics", topics)
 	controller.Assign("page", pageHtml)
+
 	categoryModel := model.Category{}
 	categories := categoryModel.GetHot(3)
 	controller.Assign("categories", categories)

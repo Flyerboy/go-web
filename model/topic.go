@@ -21,14 +21,12 @@ func (this *Topic) GetById(id int) *Topic {
 }
 
 func (this *Topic) GetLists(start, size int) ([]*Topic, int) {
-	var topics []*Topic
 
 	ch := make(chan *Topic, 5)
-
 	wg := sync.WaitGroup{}
 	wg.Add(2)
 
-	go func(topicChan chan *Topic, wg *sync.WaitGroup) {
+	go func() {
 		statement, err := getDB().Query("select id, title from topic order by id desc limit ?, ?", start, size)
 		defer statement.Close()
 		if err != nil {
@@ -41,24 +39,25 @@ func (this *Topic) GetLists(start, size int) ([]*Topic, int) {
 			if err != nil {
 				break
 			}
-			topicChan <- &t
+			ch <- &t
 		}
+		close(ch)
 		wg.Done()
-	}(ch, &wg)
+	}()
 
-	for i := 0; i < size; i++ {
-		topics = append(topics, <-ch)
+	var topics []*Topic
+	for i := range ch{
+		topics = append(topics, i)
 	}
-	close(ch)
 
 	total := 0
-	go func(total *int, wg *sync.WaitGroup) {
-		err := getDB().QueryRow("select count(id) from topic where status=1 limit 1").Scan(total)
+	go func() {
+		err := getDB().QueryRow("select count(id) from topic where status=1 limit 1").Scan(&total)
 		if err != nil {
 			// 记录日志
 		}
 		wg.Done()
-	}(&total, &wg)
+	}()
 
 	wg.Wait()
 	return topics, total
