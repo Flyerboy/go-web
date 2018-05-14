@@ -14,8 +14,9 @@ func main() {
 
 	http.HandleFunc("/", controllers.TopicIndex)
 	http.HandleFunc("/topic/index", controllers.TopicIndex)
-	http.HandleFunc("/topic", controllers.TopicShow)
 	http.HandleFunc("/topic/create", controllers.TopicCreate)
+	http.HandleFunc("/topic", controllers.TopicShow)
+
 	http.HandleFunc("/login", controllers.Login)
 	http.HandleFunc("/logout", controllers.Logout)
 	http.HandleFunc("/register", controllers.Register)

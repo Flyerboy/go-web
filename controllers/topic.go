@@ -31,6 +31,13 @@ func TopicIndex(w http.ResponseWriter, req *http.Request) {
 		template: "topic/index",
 		data: make(map[string]interface{}),
 	}
+
+	sort := req.FormValue("sort")
+	if sort == "" {
+		sort = "new"
+	}
+	controller.data["sorts"] = sort
+
 	size := 10
 	topicModel := model.Topic{}
 	count := topicModel.Count()
@@ -58,7 +65,7 @@ func TopicIndex(w http.ResponseWriter, req *http.Request) {
 func TopicCreate(w http.ResponseWriter, req *http.Request) {
 	controller := Controller{
 		writer: w,
-		template: "topic/index",
+		template: "topic/create",
 		data: make(map[string]interface{}),
 	}
 	if strings.Compare(req.Method, "POST") == 0 {

@@ -27,7 +27,25 @@ body{
 
 .topic-content{
     padding: 15px;
+    border: 1px solid #dedede;
 }
 .topic-title{
     margin-bottom: 15px;
+}
+.create-btn{
+    margin-right: 15px;
+    font-weight: bold;
+    color: #ffffff !important;
+    line-height: 150%;
+    font-size: 24px;
+    text-decoration: none !important;
+}
+.topic-btn{
+    margin-top: 10px;
+}
+.topic-btn span{
+    margin-right: 5px;
+}
+.topic .nav-link{
+    padding: 0.5rem 1rem 0.5rem 0;
 }

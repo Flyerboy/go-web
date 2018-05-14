@@ -1,18 +1,22 @@
 {{define "topic/index"}}
 
 {{template "header" .}}
-    <div class="bg-white topic">
-        <ul class="nav nav-pills float-left">
+    <ul class="list-group topic">
+        <li class="list-group-item">
+            <ul class="nav nav-pills float-left">
             {{range .categories}}
-            <li class="nav-item">
-                <a class="nav-link" href="">{{.Name}}</a>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="">{{.Name}}</a>
+                </li>
             {{end}}
-        </ul>
-        <a href="/topic/create" class="btn btn-success float-right">Create</a>
-        <div class="clearfix mb30"></div>
-    </div>
-    <ul class="list-group">
+            </ul>
+            <div class="float-right topic-btn">
+                <a href="/topic/index?sort=new"><span class="badge badge-success">New</span></a>
+                <a href="/topic/index?sort=hot"><span class="badge badge-secondary">Hot</span></a>
+                <a href="/topic/index?sort=recommend"><span class="badge badge-secondary">Recommend</span></a>
+            </div>
+            <div class="clearfix"></div>
+        </li>
         {{range .topics}}
             <li class="list-group-item"><a href="/topic?id={{.Id}}">{{.Title}}</a></li>
         {{end}}
